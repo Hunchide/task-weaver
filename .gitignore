@@ -1,0 +1,5 @@
+# Data files (user-specific, not for version control)
+task-weaver-data/
+__pycache__/
+*.pyc
+.DS_Store
