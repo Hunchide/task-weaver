@@ -78,8 +78,8 @@ git clone https://github.com/YOUR_USERNAME/task-weaver.git ~/.workbuddy/skills/t
 在对话中输入 `/okr`，然后口述你的工作目标：
 
 ```
-"我今年主要四个方向：产品能力建设（CDN 二七项目流程打通、边缘云控制台）、
-生态对接合作（CDN 供应商引入）、流程优化提效（机制设计、规范制定）、
+"我今年主要四个方向：产品能力建设（xx平台建设、xx流程打通）、
+生态对接合作（xx供应商引入）、流程优化提效（机制设计、规范制定）、
 业务能力推广（标杆项目、收入转化）"
 ```
 
@@ -90,7 +90,7 @@ AI 会帮你结构化并写入。
 每天早上输入 `/morning`，口述今天的任务：
 
 ```
-"今天主要跟 Nemo 总对齐 AI Token 的事，下午有个流程优化讨论会，
+"今天主要跟xx对齐xx事，下午有个流程优化讨论会，
 还要把业务管理规范第一章写了"
 ```
 
@@ -105,8 +105,8 @@ AI 会：
 每天晚上输入 `/evening`，口述实际完成的事（不限早上计划）：
 
 ```
-"和 Nemo 聊完了，他那边有自己逻辑，我改围观了。
-另外今天苏州电信测试对接搞定了，周大福账号也开了，燎原计划表填完了"
+"和xx聊完了，他那边有自己逻辑，我改围观了。
+另外今天xx测试对接搞定了"
 ```
 
 AI 会：
@@ -183,8 +183,8 @@ report = weekly_report("2026-06-08")
 [
   {
     "id": 1,
-    "title": "CDN 二七项目流程能力建设",
-    "description": "系统之间打通，CDN 流程能力完善",
+    "title": "xx项目流程能力建设",
+    "description": "系统之间打通，xx流程能力完善",
     "category": "产品能力建设",
     "status": "active",
     "created_at": "2026-06-08"
@@ -199,7 +199,7 @@ report = weekly_report("2026-06-08")
   {
     "id": 1,
     "date": "2026-06-08",
-    "title": "与 Nemo 总对齐 AI Token 相关事项",
+    "title": "与xx对齐xx相关事项",
     "okr_id": null,
     "urgency": "urgent",
     "importance": "important",
@@ -218,7 +218,7 @@ report = weekly_report("2026-06-08")
   {
     "id": 1,
     "date": "2026-06-08",
-    "title": "苏州电信/神州数码 Google 测试对接",
+    "title": "xx测试对接",
     "task_id": null,
     "okr_id": 3,
     "quadrant": "Q2",
