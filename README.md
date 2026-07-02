@@ -41,7 +41,7 @@ TaskWeaver 是一套**从日到周的个人任务管理与复盘系统**，以 C
 将本仓库克隆到 WorkBuddy 的 skills 目录：
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/task-weaver.git ~/.workbuddy/skills/task-weaver
+git clone https://github.com/Hunchide/task-weaver.git ~/.workbuddy/skills/task-weaver
 ```
 
 ### 方式二：手动安装
@@ -60,13 +60,19 @@ git clone https://github.com/YOUR_USERNAME/task-weaver.git ~/.workbuddy/skills/t
     └── weekly-template.md # 周报输出模板
 ```
 
-数据存储在工作区：
+数据默认存储在本机用户目录：
 
 ```
-/workspace/task-weaver-data/
+~/.task-weaver-data/
 ├── okrs.json         # 工作目标
 ├── tasks.json        # 每日待办
 └── completions.json  # 完成记录
+```
+
+如需自定义位置，可以设置环境变量：
+
+```bash
+export TASKWEAVER_DATA_DIR="$HOME/.task-weaver-data"
 ```
 
 ---
@@ -145,9 +151,14 @@ AI 会：
 ```bash
 python3 scripts/engine.py okr-list
 python3 scripts/engine.py okr-add "目标标题" "描述" "分类"
+python3 scripts/engine.py okr-update 1 --title "新标题" --status active
 python3 scripts/engine.py okr-delete 1
+python3 scripts/engine.py task-add "完成 PRD" --date 2026-06-08 --okr-id 1 --quadrant Q1
+python3 scripts/engine.py task-update 1 --status done
+python3 scripts/engine.py task-delete 1
 python3 scripts/engine.py task-list 2026-06-08
 python3 scripts/engine.py task-pending 2026-06-08
+python3 scripts/engine.py completion-add "完成 PRD" --date 2026-06-08 --task-id 1 --okr-id 1 --quadrant Q1 --source planned
 python3 scripts/engine.py completion-list 2026-06-08
 python3 scripts/engine.py weekly-report 2026-06-08
 python3 scripts/engine.py data-status
@@ -252,7 +263,7 @@ A: 这是设计如此。计划外的自动归类为「额外完成」，同样�
 A: 可以，添加一个「生活」分类的目标就行，比如健身、阅读等。
 
 **Q: 数据会丢吗？**
-A: 数据存在 `/workspace/task-weaver-data/` 下，纯 JSON 文件，随时可备份。
+A: 数据默认存在 `~/.task-weaver-data/` 下，纯 JSON 文件，随时可备份。也可以用 `TASKWEAVER_DATA_DIR` 指定到其他目录。
 
 ---
 

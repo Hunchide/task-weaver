@@ -8,7 +8,8 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 计划任务：{total_planned} 项
 完成任务：{total_completed} 项（计划内 {planned_completions} + 额外 {extra_completions}）
-完成率：{completion_rate}
+计划完成率：{planned_completion_rate}
+额外完成：{extra_completions} 项
 
 每日趋势：
 周一 ████ 4/5

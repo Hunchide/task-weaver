@@ -2,7 +2,7 @@
 """
 TaskWeaver Engine —— 个人任务编织器数据引擎
 
-数据存储在 /workspace/task-weaver-data/ 目录下的 JSON 文件中：
+数据默认存储在 ~/.task-weaver-data/ 目录下，也可通过 TASKWEAVER_DATA_DIR 指定：
 - okrs.json: 工作目标
 - tasks.json: 每日待办
 - completions.json: 完成记录
@@ -14,7 +14,7 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-DATA_DIR = Path(os.environ.get("TASKWEAVER_DATA_DIR", "/workspace/task-weaver-data"))
+DATA_DIR = Path(os.environ.get("TASKWEAVER_DATA_DIR", Path.home() / ".task-weaver-data"))
 
 
 # ─── 工具函数 ───────────────────────────────────────────────
@@ -63,6 +63,27 @@ def _get_week_range(date_str=None):
     monday = d - timedelta(days=d.weekday())
     sunday = monday + timedelta(days=6)
     return monday.strftime("%Y-%m-%d"), sunday.strftime("%Y-%m-%d")
+
+
+def _print_json(result):
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+def _option(args, name, default=None, cast=None):
+    if name not in args:
+        return default
+    index = args.index(name)
+    if index + 1 >= len(args):
+        raise ValueError(f"Missing value for {name}")
+    value = args[index + 1]
+    return cast(value) if cast else value
+
+
+def _require_item(item, label, item_id):
+    if item is None:
+        print(f"{label} not found: {item_id}", file=sys.stderr)
+        sys.exit(1)
+    return item
 
 
 # ─── OKR 管理 ──────────────────────────────────────────────
@@ -245,7 +266,8 @@ def weekly_report(date=None):
 
     total_planned = len(week_tasks)
     total_completed = len(week_completions)
-    completion_rate = f"{total_completed / total_planned * 100:.1f}%" if total_planned > 0 else "N/A"
+    planned_done = len(planned_completions)
+    planned_completion_rate = f"{planned_done / total_planned * 100:.1f}%" if total_planned > 0 else "N/A"
 
     return {
         "week_range": {"start": monday, "end": sunday},
@@ -254,7 +276,8 @@ def weekly_report(date=None):
             "total_completed": total_completed,
             "planned_completions": len(planned_completions),
             "extra_completions": len(extra_completions),
-            "completion_rate": completion_rate,
+            "planned_completion_rate": planned_completion_rate,
+            "completion_rate": planned_completion_rate,
         },
         "daily_stats": daily_stats,
         "okr_stats": okr_stats,
@@ -291,15 +314,16 @@ def data_status():
 def main():
     if len(sys.argv) < 2:
         print("Usage: python engine.py <command> [args...]")
-        print("Commands: okr-list, okr-add, okr-delete, task-list, task-pending,")
-        print("          completion-list, weekly-report, data-status")
+        print("Commands: okr-list, okr-add, okr-update, okr-delete,")
+        print("          task-list, task-add, task-update, task-delete, task-pending,")
+        print("          completion-list, completion-add, weekly-report, data-status")
         sys.exit(1)
 
     command = sys.argv[1]
 
     if command == "okr-list":
         result = okr_list()
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _print_json(result)
 
     elif command == "okr-add":
         if len(sys.argv) < 3:
@@ -309,7 +333,21 @@ def main():
         desc = sys.argv[3] if len(sys.argv) > 3 else ""
         cat = sys.argv[4] if len(sys.argv) > 4 else ""
         result = okr_add(title, desc, cat)
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _print_json(result)
+
+    elif command == "okr-update":
+        if len(sys.argv) < 3:
+            print("Usage: python engine.py okr-update <id> [--title value] [--description value] [--category value] [--status value]")
+            sys.exit(1)
+        args = sys.argv[3:]
+        result = okr_update(
+            int(sys.argv[2]),
+            title=_option(args, "--title"),
+            description=_option(args, "--description"),
+            category=_option(args, "--category"),
+            status=_option(args, "--status"),
+        )
+        _print_json(_require_item(result, "OKR", sys.argv[2]))
 
     elif command == "okr-delete":
         if len(sys.argv) < 3:
@@ -321,26 +359,82 @@ def main():
     elif command == "task-list":
         date = sys.argv[2] if len(sys.argv) > 2 else None
         result = task_list(date)
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _print_json(result)
+
+    elif command == "task-add":
+        if len(sys.argv) < 3:
+            print("Usage: python engine.py task-add <title> [--date YYYY-MM-DD] [--okr-id id] [--urgency value] [--importance value] [--quadrant Q1-Q4] [--notes value]")
+            sys.exit(1)
+        args = sys.argv[3:]
+        result = add_task(
+            title=sys.argv[2],
+            for_date=_option(args, "--date"),
+            okr_id=_option(args, "--okr-id", cast=int),
+            urgency=_option(args, "--urgency"),
+            importance=_option(args, "--importance"),
+            quadrant=_option(args, "--quadrant"),
+            notes=_option(args, "--notes"),
+        )
+        _print_json(result)
+
+    elif command == "task-update":
+        if len(sys.argv) < 3:
+            print("Usage: python engine.py task-update <id> [--title value] [--date YYYY-MM-DD] [--okr-id id] [--urgency value] [--importance value] [--quadrant Q1-Q4] [--status value] [--notes value]")
+            sys.exit(1)
+        args = sys.argv[3:]
+        result = update_task(
+            int(sys.argv[2]),
+            title=_option(args, "--title"),
+            date=_option(args, "--date"),
+            okr_id=_option(args, "--okr-id", cast=int),
+            urgency=_option(args, "--urgency"),
+            importance=_option(args, "--importance"),
+            quadrant=_option(args, "--quadrant"),
+            status=_option(args, "--status"),
+            notes=_option(args, "--notes"),
+        )
+        _print_json(_require_item(result, "Task", sys.argv[2]))
+
+    elif command == "task-delete":
+        if len(sys.argv) < 3:
+            print("Usage: python engine.py task-delete <id>")
+            sys.exit(1)
+        delete_task(int(sys.argv[2]))
+        _print_json({"deleted": True, "id": int(sys.argv[2])})
 
     elif command == "task-pending":
         date = sys.argv[2] if len(sys.argv) > 2 else None
         result = task_pending(date)
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _print_json(result)
 
     elif command == "completion-list":
         date = sys.argv[2] if len(sys.argv) > 2 else None
         result = completion_list(date)
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _print_json(result)
+
+    elif command == "completion-add":
+        if len(sys.argv) < 3:
+            print("Usage: python engine.py completion-add <title> [--date YYYY-MM-DD] [--task-id id] [--okr-id id] [--quadrant Q1-Q4] [--source planned|extra]")
+            sys.exit(1)
+        args = sys.argv[3:]
+        result = add_completion(
+            title=sys.argv[2],
+            task_id=_option(args, "--task-id", cast=int),
+            okr_id=_option(args, "--okr-id", cast=int),
+            quadrant=_option(args, "--quadrant"),
+            source=_option(args, "--source", "planned"),
+            for_date=_option(args, "--date"),
+        )
+        _print_json(result)
 
     elif command == "weekly-report":
         date = sys.argv[2] if len(sys.argv) > 2 else None
         result = weekly_report(date)
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _print_json(result)
 
     elif command == "data-status":
         result = data_status()
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        _print_json(result)
 
     else:
         print(f"Unknown command: {command}")

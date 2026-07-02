@@ -2,7 +2,6 @@
 name: task-weaver
 description: 个人任务管理与复盘系统 —— 从日到周的任务编织器。支持 OKR 管理、晨间任务拆解与四象限标注、晚间完成勾销、周报复盘分析。当用户提到任务管理、OKR、晨间规划、晚间复盘、周报、四象限、任务编织等关键词时使用此 skill。
 allowed-tools: Read, Write, Bash
-agent_created: true
 ---
 
 # TaskWeaver —— 个人任务编织器
@@ -26,7 +25,7 @@ agent_created: true
 
 ## 数据引擎
 
-使用 `scripts/engine.py` 作为数据引擎，通过命令行调用。数据存储在 `/workspace/task-weaver-data/` 目录下的 JSON 文件中。
+使用 `scripts/engine.py` 作为数据引擎，通过命令行调用。数据默认存储在 `~/.task-weaver-data/`，也可以用 `TASKWEAVER_DATA_DIR` 指定。
 
 **重要：** 每次执行命令前，先运行 `data-status` 了解当前数据状态，以便给出上下文相关的提示。
 
@@ -36,14 +35,19 @@ agent_created: true
 # OKR 管理
 python3 scripts/engine.py okr-list
 python3 scripts/engine.py okr-add "<title>" "<desc>" "<category>"
+python3 scripts/engine.py okr-update <id> --title "<title>" --description "<desc>" --category "<category>" --status active
 python3 scripts/engine.py okr-delete <id>
 
 # 待办管理
 python3 scripts/engine.py task-list [date]
+python3 scripts/engine.py task-add "<title>" --date YYYY-MM-DD --okr-id <id> --quadrant Q1
+python3 scripts/engine.py task-update <id> --status done --quadrant Q2
+python3 scripts/engine.py task-delete <id>
 python3 scripts/engine.py task-pending [date]
 
 # 完成记录
 python3 scripts/engine.py completion-list [date]
+python3 scripts/engine.py completion-add "<title>" --date YYYY-MM-DD --task-id <id> --okr-id <id> --quadrant Q1 --source planned
 
 # 周报
 python3 scripts/engine.py weekly-report [date]
@@ -78,8 +82,9 @@ add_completion(title="xxx", task_id=1, okr_id=1, quadrant="Q1",
 **流程：**
 
 1. 运行 `data-status` 查看当前 OKR 数量
-2. OKR 为空 → 引导用户录入（口述 → AI 拆解 → 确认 → 写入）
+2. OKR 为空 → 引导用户录入（口述 → AI 拆解 → 确认 → 用 `okr-add` 写入）
 3. OKR 已有 → 展示列表，提供查看/添加/修改/删除选项
+4. 用户确认修改时用 `okr-update`；用户确认删除时用 `okr-delete`
 
 **输出格式：**
 
@@ -108,7 +113,7 @@ add_completion(title="xxx", task_id=1, okr_id=1, quadrant="Q1",
 1. **口述接收** — 用户自由口述今天任务，AI 拆解为可执行待办
 2. **目标关联** — 读取 OKR，自动判断每个待办关联哪个目标
 3. **四象限标注** — AI 建议象限，用户快速确认或调整
-4. **确认写入** — 写入数据
+4. **确认写入** — 用户确认后，用 `task-add` 逐条写入数据；未确认前不要写入
 
 **四象限定义：**
 
@@ -150,7 +155,7 @@ add_completion(title="xxx", task_id=1, okr_id=1, quadrant="Q1",
 2. **口述接收** — 用户自由口述实际完成的事项（不限于早上计划）
 3. **智能匹配** — 与今日待做语义匹配：匹配 → 勾销；不匹配 → 额外完成
 4. **补充标注** — 额外事项自动判断四象限和目标关联
-5. **确认写入** — 写入完成记录并更新待办状态
+5. **确认写入** — 用户确认后，用 `completion-add` 写入完成记录；计划内事项带 `--task-id` 会自动把待办标记为 done；额外完成使用 `--source extra`
 
 **输出格式：**
 
@@ -187,7 +192,7 @@ add_completion(title="xxx", task_id=1, okr_id=1, quadrant="Q1",
 4. **无关事项挖掘** — 未关联目标事项聚类，识别新方向
 5. **改进建议** — 可执行的改进建议
 
-详细输出格式参见 `references/weekly-template.md`。
+详细输出格式参见 `references/weekly-template.md`。周报里的完成率使用计划完成率：计划内完成数 / 计划任务数；额外完成单独展示，不把完成率冲到 100% 以上。
 
 ---
 
@@ -201,5 +206,5 @@ add_completion(title="xxx", task_id=1, okr_id=1, quadrant="Q1",
 
 ## 工作目录
 
-- 数据目录：`/workspace/task-weaver-data/`
+- 数据目录：默认 `~/.task-weaver-data/`；可设置 `TASKWEAVER_DATA_DIR`
 - 引擎脚本：`scripts/engine.py`（相对于 skill 目录）
