@@ -1,75 +1,77 @@
-# TaskWeaver —— 个人任务编织器
+# TaskWeaver — Personal Task Weaver
 
-> 让每一天的努力都看得见方向，让每一周的复盘都长出新的可能。
+> Make every day's effort point somewhere, and every weekly review grow something new.
 
----
-
-## 这是什么
-
-TaskWeaver 是一套**从日到周的个人任务管理与复盘系统**，以 CodeBuddy/WorkBuddy Skill 的形式运行。核心理念是把每天的零散任务编织到长期工作目标中，并通过四象限（重要/紧急）分析帮助你持续聚焦。
-
-**解决的问题：**
-- 每天忙忙碌碌，但说不清楚做的事和 OKR/KPI 有什么关系
-- 精力被不重要不紧急的事消耗，真正重要的事反而没推进
-- 每周写周报痛苦——不记得做了什么，也不知道怎么复盘
-- 一些"计划外"的事反复出现，但从未被系统性地审视过
+> **Language:** English | [简体中文](README.zh-CN.md)
 
 ---
 
-## 工作流
+## What it is
+
+TaskWeaver is a **day-to-week personal task management and review system** that runs as a CodeBuddy/WorkBuddy Skill. The core idea is to weave scattered daily tasks into long-term work goals, and keep you focused through Eisenhower-matrix (important/urgent) analysis.
+
+**Problems it solves:**
+- Busy all day, but unable to say how the work connects to your OKRs/KPIs
+- Energy drained by unimportant, non-urgent things while what truly matters stalls
+- Weekly reports are painful — you don't remember what you did, or how to reflect
+- "Unplanned" things keep recurring but are never examined systematically
+
+---
+
+## Workflow
 
 ```
-设定目标 → 每日晨间规划 → 每日晚间复盘 → 周末深度复盘
-  /okr       /morning        /evening        /weekly
+Set goals → Daily morning planning → Daily evening review → Weekly deep review
+  /okr           /morning                /evening              /weekly
 ```
 
-### 四个命令
+### The four commands
 
-| 命令 | 时机 | 做什么 |
+| Command | When | What it does |
 |------|------|--------|
-| `/okr` | 初始化 + 随时 | 录入和管理 OKR / 工作目标 |
-| `/morning` | 每天早上 | 口述今天要做什么 → AI 拆解待办 → 自动关联目标 → 建议四象限 |
-| `/evening` | 每天晚上 | 口述实际完成了什么 → AI 匹配勾销 → 记录额外完成 |
-| `/weekly` | 每周末 | 生成周报复盘：目标关联分析 + 四象限统计 + 无关事项挖掘 + 改进建议 |
+| `/okr` | Setup + anytime | Enter and manage OKRs / work goals |
+| `/morning` | Every morning | Dictate today's tasks → AI breaks into todos → auto-links to goals → suggests quadrants |
+| `/evening` | Every evening | Dictate what you actually finished → AI matches and checks off → logs extra completions |
+| `/weekly` | Every weekend | Generates a review report: goal-alignment analysis + quadrant stats + off-plan discovery + improvement suggestions |
 
 ---
 
-## 安装
+## Installation
 
-### 方式一：作为 WorkBuddy Skill 安装
+### Option 1: Install as a WorkBuddy Skill
 
-将本仓库克隆到 WorkBuddy 的 skills 目录：
+Clone this repo into your WorkBuddy skills directory:
 
 ```bash
 git clone https://github.com/Hunchide/task-weaver.git ~/.workbuddy/skills/task-weaver
 ```
 
-### 方式二：手动安装
+### Option 2: Manual install
 
-1. 下载或克隆本仓库
-2. 将整个 `task-weaver` 目录复制到 `~/.workbuddy/skills/task-weaver/`
-3. 确保目录结构如下：
+1. Download or clone this repo
+2. Copy the whole `task-weaver` directory to `~/.workbuddy/skills/task-weaver/`
+3. Ensure the structure looks like:
 
 ```
 ~/.workbuddy/skills/task-weaver/
-├── SKILL.md              # Skill 定义和 AI 行为说明书
-├── README.md             # 本文件
+├── SKILL.md              # Skill definition and AI behavior spec
+├── README.md             # This file
 ├── scripts/
-│   └── engine.py         # 核心数据引擎
+│   └── engine.py         # Core data engine
 └── references/
-    └── weekly-template.md # 周报输出模板
+    └── weekly-template.md # Weekly report output template
 ```
 
-数据默认存储在本机用户目录：
+Data is stored locally by default:
 
 ```
 ~/.task-weaver-data/
-├── okrs.json         # 工作目标
-├── tasks.json        # 每日待办
-└── completions.json  # 完成记录
+├── okrs.json         # Work goals
+├── tasks.json        # Daily todos
+└── completions.json  # Completion records
 ```
 
-如需自定义位置，可以设置环境变量：
+To use a custom location, set an environment variable:
 
 ```bash
 export TASKWEAVER_DATA_DIR="$HOME/.task-weaver-data"
@@ -77,88 +79,88 @@ export TASKWEAVER_DATA_DIR="$HOME/.task-weaver-data"
 
 ---
 
-## 快速上手
+## Getting started
 
-### 1. 设定目标
+### 1. Set your goals
 
-在对话中输入 `/okr`，然后口述你的工作目标：
-
-```
-"我今年主要四个方向：产品能力建设（xx平台建设、xx流程打通）、
-生态对接合作（xx供应商引入）、流程优化提效（机制设计、规范制定）、
-业务能力推广（标杆项目、收入转化）"
-```
-
-AI 会帮你结构化并写入。
-
-### 2. 晨间规划
-
-每天早上输入 `/morning`，口述今天的任务：
+Type `/okr` in chat, then dictate your work goals:
 
 ```
-"今天主要跟xx对齐xx事，下午有个流程优化讨论会，
-还要把业务管理规范第一章写了"
+"Four main directions this year: product capability building (xx platform, xx process integration),
+ecosystem partnerships (xx supplier onboarding), process optimization (mechanism design, standards),
+business capability promotion (benchmark projects, revenue conversion)"
 ```
 
-AI 会：
-- 拆解为具体待办
-- 自动关联到已有目标
-- 建议每个待办的四象限（重要且紧急 / 重要不紧急 / 紧急不重要 / 不重要不紧急）
-- 你只需回复「全部OK」或快速调整
+AI structures it and writes it out.
 
-### 3. 晚间复盘
+### 2. Morning planning
 
-每天晚上输入 `/evening`，口述实际完成的事（不限早上计划）：
+Each morning type `/morning` and dictate today's tasks:
 
 ```
-"和xx聊完了，他那边有自己逻辑，我改围观了。
-另外今天xx测试对接搞定了"
+"Mainly aligning with xx on xx today, afternoon has a process optimization meeting,
+and I need to write chapter one of the business management spec"
 ```
 
-AI 会：
-- 自动匹配勾销计划内待办
-- 将计划外完成事项归类为「额外完成」
-- 为额外事项自动判断目标关联和四象限
+AI will:
+- Break them into concrete todos
+- Auto-link to existing goals
+- Suggest an Eisenhower quadrant for each (important & urgent / important not urgent / urgent not important / neither)
+- You just reply "all OK" or tweak quickly
 
-### 4. 周末复盘
+### 3. Evening review
 
-每周末输入 `/weekly`，AI 生成完整复盘报告：
+Each evening type `/evening` and dictate what you actually finished (not limited to the morning plan):
 
-- **目标关联分析**：每个 OKR 下的进展，哪些被忽略了
-- **四象限统计**：你的精力花在哪儿了
-- **无关事项挖掘**：计划外事项能否长出新的工作目标
-- **改进建议**：如何减少不重要不紧急、提升长期价值投入
+```
+"Finished talking with xx — they have their own logic, so I switched to observing.
+Also wrapped up the xx test integration today"
+```
+
+AI will:
+- Auto-match and check off planned todos
+- Classify off-plan completions as "extra completions"
+- Auto-assign goal links and quadrants to the extra items
+
+### 4. Weekly review
+
+Each weekend type `/weekly` and AI generates a full review report:
+
+- **Goal-alignment analysis**: progress under each OKR, what got neglected
+- **Quadrant stats**: where your energy actually went
+- **Off-plan discovery**: could unplanned items grow into new work goals
+- **Improvement suggestions**: how to spend less on unimportant/non-urgent and invest more in long-term value
 
 ---
 
-## 四象限说明
+## The four quadrants
 
-| 象限 | 含义 | 策略 |
+| Quadrant | Meaning | Strategy |
 |------|------|------|
-| 🔴 重要且紧急 | 有 deadline、影响关键结果 | 立即处理 |
-| 🟡 重要不紧急 | 能力提升、长期规划、预防性工作 | **重点投入**（目标 40-60%） |
-| 🔵 紧急不重要 | 他人催促、常规汇报 | 委托或快速处理 |
-| ⚪ 不重要不紧急 | 琐事、过度优化 | 减少 / 委托 / 删除 |
+| 🔴 Important & urgent | Has a deadline, affects key results | Handle immediately |
+| 🟡 Important, not urgent | Capability building, long-term planning, prevention | **Focus here** (target 40–60%) |
+| 🔵 Urgent, not important | Others' requests, routine reports | Delegate or handle quickly |
+| ⚪ Neither | Trivia, over-optimization | Reduce / delegate / delete |
 
 ---
 
-## 数据引擎 API
+## Data engine API
 
-`scripts/engine.py` 提供命令行和 Python 两种调用方式：
+`scripts/engine.py` supports both CLI and Python calls.
 
-### 命令行
+### CLI
 
 ```bash
 python3 scripts/engine.py okr-list
-python3 scripts/engine.py okr-add "目标标题" "描述" "分类"
-python3 scripts/engine.py okr-update 1 --title "新标题" --status active
+python3 scripts/engine.py okr-add "Goal title" "Description" "Category"
+python3 scripts/engine.py okr-update 1 --title "New title" --status active
 python3 scripts/engine.py okr-delete 1
-python3 scripts/engine.py task-add "完成 PRD" --date 2026-06-08 --okr-id 1 --quadrant Q1
+python3 scripts/engine.py task-add "Finish PRD" --date 2026-06-08 --okr-id 1 --quadrant Q1
 python3 scripts/engine.py task-update 1 --status done
 python3 scripts/engine.py task-delete 1
 python3 scripts/engine.py task-list 2026-06-08
 python3 scripts/engine.py task-pending 2026-06-08
-python3 scripts/engine.py completion-add "完成 PRD" --date 2026-06-08 --task-id 1 --okr-id 1 --quadrant Q1 --source planned
+python3 scripts/engine.py completion-add "Finish PRD" --date 2026-06-08 --task-id 1 --okr-id 1 --quadrant Q1 --source planned
 python3 scripts/engine.py completion-list 2026-06-08
 python3 scripts/engine.py weekly-report 2026-06-08
 python3 scripts/engine.py data-status
@@ -171,22 +173,22 @@ import sys
 sys.path.insert(0, "scripts")
 from engine import okr_list, okr_add, add_task, update_task, add_completion, weekly_report
 
-# 添加 OKR
-okr = okr_add("产品能力建设", "系统之间打通", "产品")
+# Add an OKR
+okr = okr_add("Product capability building", "Integrate systems", "Product")
 
-# 添加待办
-task = add_task(title="完成 PRD", for_date="2026-06-08", okr_id=1, quadrant="Q1")
+# Add a todo
+task = add_task(title="Finish PRD", for_date="2026-06-08", okr_id=1, quadrant="Q1")
 
-# 记录完成
-add_completion(title="完成 PRD", task_id=1, okr_id=1, quadrant="Q1", source="planned")
+# Log a completion
+add_completion(title="Finish PRD", task_id=1, okr_id=1, quadrant="Q1", source="planned")
 
-# 生成周报
+# Generate a weekly report
 report = weekly_report("2026-06-08")
 ```
 
 ---
 
-## 数据文件格式
+## Data file formats
 
 ### okrs.json
 
@@ -194,9 +196,9 @@ report = weekly_report("2026-06-08")
 [
   {
     "id": 1,
-    "title": "xx项目流程能力建设",
-    "description": "系统之间打通，xx流程能力完善",
-    "category": "产品能力建设",
+    "title": "xx project process capability building",
+    "description": "Integrate systems, complete the xx process",
+    "category": "Product capability building",
     "status": "active",
     "created_at": "2026-06-08"
   }
@@ -210,7 +212,7 @@ report = weekly_report("2026-06-08")
   {
     "id": 1,
     "date": "2026-06-08",
-    "title": "与xx对齐xx相关事项",
+    "title": "Align with xx on xx items",
     "okr_id": null,
     "urgency": "urgent",
     "importance": "important",
@@ -229,7 +231,7 @@ report = weekly_report("2026-06-08")
   {
     "id": 1,
     "date": "2026-06-08",
-    "title": "xx测试对接",
+    "title": "xx test integration",
     "task_id": null,
     "okr_id": 3,
     "quadrant": "Q2",
@@ -241,29 +243,29 @@ report = weekly_report("2026-06-08")
 
 ---
 
-## 设计哲学
+## Design philosophy
 
-1. **口述即输入** — 不需要填表单，像跟人聊天一样说就行
-2. **AI 做判断，人做决策** — AI 给建议（关联、象限），你只需确认或微调
-3. **完成不限于计划** — 晚上说的完成事项可以超出早上计划，灵活真实
-4. **从无关中长出新方向** — 计划外事项不是噪音，可能是新的工作重心信号
-5. **数据透明可控** — 所有数据存在本地 JSON 文件中，随时可查看、手动编辑
+1. **Speaking is input** — no forms to fill; just talk like you're chatting with a person
+2. **AI judges, you decide** — AI suggests (links, quadrants); you confirm or fine-tune
+3. **Completion isn't limited to the plan** — evening completions can exceed the morning plan; flexible and honest
+4. **New directions grow from the off-plan** — unplanned items aren't noise, they may signal a new work priority
+5. **Transparent, controllable data** — everything lives in local JSON files, viewable and hand-editable anytime
 
 ---
 
-## 常见问题
+## FAQ
 
-**Q: 目标可以随时修改吗？**
-A: 可以。对 AI 说「改目标 X」就行，也可以直接编辑 `okrs.json` 文件。
+**Q: Can goals be changed anytime?**
+A: Yes. Just tell the AI "change goal X", or edit `okrs.json` directly.
 
-**Q: 晚上说的完成事项能超出早上计划吗？**
-A: 这是设计如此。计划外的自动归类为「额外完成」，同样做四象限和目标关联分析。
+**Q: Can evening completions exceed the morning plan?**
+A: By design. Off-plan items are auto-classified as "extra completions" and get the same quadrant and goal-alignment analysis.
 
-**Q: 生活事项能一起管吗？**
-A: 可以，添加一个「生活」分类的目标就行，比如健身、阅读等。
+**Q: Can I manage life stuff too?**
+A: Yes — add a goal in a "Life" category, e.g. fitness or reading.
 
-**Q: 数据会丢吗？**
-A: 数据默认存在 `~/.task-weaver-data/` 下，纯 JSON 文件，随时可备份。也可以用 `TASKWEAVER_DATA_DIR` 指定到其他目录。
+**Q: Will data be lost?**
+A: Data lives in `~/.task-weaver-data/` as plain JSON — back it up anytime. You can point `TASKWEAVER_DATA_DIR` elsewhere.
 
 ---
 
